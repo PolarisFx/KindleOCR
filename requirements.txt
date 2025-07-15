@@ -1,5 +1,5 @@
-selenium
-pillow
+selenium~=4.34.2
+pillow~=10.4.0
 marker-pdf
 pypandoc_binary
-dotenv
+dotenv~=0.9.9

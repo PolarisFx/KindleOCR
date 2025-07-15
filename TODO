@@ -1,0 +1,1 @@
+Handle error when the same job name is used. Ask user if they wish to delete folder?

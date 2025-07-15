@@ -71,8 +71,6 @@ driver.fullscreen_window()
 time.sleep(2)
 elem = driver.find_element(By.CLASS_NAME, "pagination-container")
 elem.click()
-time.sleep(2)
-driver.fullscreen_window()
 time.sleep(5)
 endofbook = False
 page = 0

@@ -12,7 +12,6 @@ import pypandoc
 import os
 from dotenv import load_dotenv
 import argparse
-import re
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--title", help="Name of the Kindle title to convert", type=str,required=True)
@@ -68,6 +67,10 @@ elem.click()
 #capturing process setup
 time.sleep(2)
 driver.fullscreen_window()
+time.sleep(2)
+elem = driver.find_element(By.CLASS_NAME, "pagination-container")
+elem.click()
+
 time.sleep(5)
 endofbook = False
 page = 0
@@ -131,44 +134,6 @@ with open(jobfolder+jobname+".md", 'wt') as f:
 for idx, x in enumerate(images):
     images[x].save(jobfolder+x)
 
-input_markdown_file = jobfolder+jobname+".md"
-output_epub_file = jobfolder+jobname+".epub"
-temp_markdown_file = jobfolder+jobname+".temp.md" # A temporary file for the modified markdown
-
 print("Running OCR.  Converting Markdown to ePub")
-
-# Read the original Markdown content
-with open(input_markdown_file, 'r', encoding='utf-8') as f:
-    markdown_content = f.read()
-
-# Replace '## ' with '**' at the beginning of a line and add closing '**'
-# This regex looks for '## ' at the start of a line (^)
-# and captures the rest of the line (.*)
-# Then it replaces it with '**\1**' where \1 is the captured text.
-processed_content = re.sub(r'^(##\s*)(.*)$', r'**\2**', markdown_content, flags=re.MULTILINE)
-
-# Save the processed content to a temporary file
-with open(temp_markdown_file, 'w', encoding='utf-8') as f:
-    f.write(processed_content)
-
-try:
-    # Convert the temporary Markdown file to EPUB
-    # Explicitly set --epub-chapter-level=1 to ensure only # (h1) creates chapters
-    # Use --split-level=1 for Pandoc 3+
-    pandoc_args = [f'--split-level=1 --resource-path='+jobfolder]
-    pypandoc.convert_file(
-        temp_markdown_file,
-        'epub',
-        outputfile=output_epub_file,
-        extra_args=pandoc_args
-    )
-    print(f"Successfully converted '{input_markdown_file}' to '{output_epub_file}'")
-
-except Exception as e:
-    print(f"Error during Pandoc conversion: {e}")
-
-finally:
-    # Clean up the temporary file
-    import os
-    if os.path.exists(temp_markdown_file):
-        os.remove(temp_markdown_file)
+pandoc_extra_arguments = [f'--resource-path='+jobfolder]
+pypandoc.convert_file(jobfolder+jobname+".md", 'epub',extra_args=pandoc_extra_arguments, outputfile=jobfolder+jobname+".epub")
